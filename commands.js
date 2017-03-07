@@ -11,7 +11,6 @@ function date(){
 }
 
 function ls(){
-  var output = "";
   fs.readdir('.', function(err, files) {
     if(err) throw err;
     process.stdout.write(files.join("\n"));
@@ -19,7 +18,11 @@ function ls(){
 }
 
 function echo(input){
-  console.log(input.join(" "));
+  // process.stdout.write(input.join(" "));
+  var output = input.map(function(arg){
+    return arg[0] === "$" ? process.env[arg.slice(1)] : arg;
+  }).join(" ");
+  process.stdout.write(output);
 }
 
 function cat(input){
@@ -37,32 +40,18 @@ function cat(input){
 }
 
 function head(input) {
-  var instream = fs.createReadStream(input[0]);
-  var rl = readline.createInterface({input: instream, output: process.stdout, terminal: false, historySize: 5});
-  var count = 0;
-  rl.on('line', function(line){
-    if(count <5){
-      console.log(line);
-      count++
-    }
-  })
-  rl.on("close", function(line){
-    process.stdout.write('\nprompt > ');
+  input = input[0];
+  fs.readFile(input, {enconding: "utf8"}, function(err,text){
+    if(err) throw err;
+    process.stdout.write(text.toString().split('\n').slice(0,5).join('\n'));
   })
 }
 
 function tail(input) {
-  var instream = fs.createReadStream(input[0]);
-  var rl = readline.createInterface({input: instream, output: process.stdout, terminal: false, historySize: 5});
-  var count = 0;
-  // rl.on('line', function(line){
-  //   if(count <5){
-  //     console.log(line);
-  //     count++
-  //   }
-  // })
-  rl.on("close", function(line){
-    process.stdout.write('\nprompt > ');
+  input = input[0];
+  fs.readFile(input,{enconding: "utf8"}, function(err,text){
+    if(err) throw err;
+    process.stdout.write(text.toString().split("\n").slice(-5).join("\n"));
   })
 }
 
